@@ -78,20 +78,12 @@ const Mutation = {
       info
     );
   },
-  deletePost(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const postIndx = ctx.posts.findIndex(pst => pst.id === args.id);
-    if (postIndx === -1) {
+  async deletePost(parent: any, args: { id: string }, ctx: Context, info: any) {
+    const postExists = await ctx.prisma.exists.Post({ id: args.id });
+    if (!postExists) {
       throw new Error("No post with that ID");
     }
-    const [deletedPost] = ctx.posts.splice(postIndx, 1);
-    ctx.comments = ctx.comments.filter(cmt => cmt.post !== args.id);
-    ctx.pubsub.publish("post", {
-      post: {
-        mutation: "DELETED",
-        data: deletedPost
-      }
-    });
-    return deletedPost;
+    return ctx.prisma.mutation.deletePost({ where: { id: args.id } }, info);
   },
   createComment(
     parent: any,
