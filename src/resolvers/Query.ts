@@ -11,15 +11,13 @@ const Query = {
     return ctx.prisma.query.users(opArgs, info);
   },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    return ctx.prisma.query.posts({}, info);
-    // if (!args.query) {
-    //   return posts;
-    // }
-    // return ctx.posts.filter(
-    //   pst =>
-    //     pst.title.toLowerCase().includes(args.query!.toLowerCase()) ||
-    //     pst.body.toLowerCase().includes(args.query!.toLowerCase())
-    // );
+    const opArgs = {} as any;
+    if (args.query) {
+      opArgs.where = {
+        OR: [{ title_contains: args.query }, { body_contains: args.query }]
+      };
+    }
+    return ctx.prisma.query.posts(opArgs, info);
   },
   comments(parent: any, args: { query?: string }, ctx: Context, info: any) {
     if (!args.query) {
