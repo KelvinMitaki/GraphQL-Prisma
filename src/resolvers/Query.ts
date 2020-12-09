@@ -2,16 +2,16 @@ import { comments, Context, posts, users } from "../db";
 
 const Query = {
   users(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    // if (!args.query) {
-    //   return users;
-    // }
-    // return ctx.users.filter(usr =>
-    //   usr.name.toLowerCase().includes(args.query!.toLowerCase())
-    // );
-    return ctx.prisma.query.users(undefined, info);
+    const opArgs = {} as any;
+    if (args.query) {
+      opArgs.where = {
+        OR: [{ name_contains: args.query }, { email_contains: args.query }]
+      };
+    }
+    return ctx.prisma.query.users(opArgs, info);
   },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    return ctx.prisma.query.posts(undefined, info);
+    return ctx.prisma.query.posts({}, info);
     // if (!args.query) {
     //   return posts;
     // }
