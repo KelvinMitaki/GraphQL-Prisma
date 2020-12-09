@@ -3,26 +3,18 @@ import { v1 } from "uuid";
 import { Context } from "../db";
 
 const Mutation = {
-  createUser(
+  async createUser(
     parent: any,
     args: { data: { name: string; email: string; age: number } },
     ctx: Context,
     info: any
   ) {
-    const emailExists = ctx.users.some(
-      usr => usr.email.toLowerCase() === args.data.email.toLowerCase()
-    );
-    if (emailExists) {
-      throw new Error("Email exists");
+    const emailTaken = await ctx.prisma.exists.User({ email: args.data.email });
+    if (emailTaken) {
+      throw new Error("User with that email already exists");
     }
-    const user: typeof users[0] = {
-      id: v1(),
-      name: args.data.name,
-      email: args.data.email,
-      age: args.data.age
-    };
-    ctx.users.push(user);
-    return user;
+
+    return ctx.prisma.mutation.createUser({ data: args.data }, info);
   },
   updateUser(
     parent: any,

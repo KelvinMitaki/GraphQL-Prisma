@@ -25,7 +25,14 @@ const Query = {
     const opArgs = {} as OpArgs;
     if (args.query) {
       opArgs.where = {
-        OR: [{ text_contains: args.query }, { author_contains: args.query }]
+        OR: [
+          { text_contains: args.query }
+          // {
+          //   author: {
+          //     OR: [{ name_contains: args.query, email_contains: args.query }]
+          //   }
+          // }
+        ]
       };
     }
     return ctx.prisma.query.comments(opArgs, info);
