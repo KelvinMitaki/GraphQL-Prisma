@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "@types/uuid": "^8.3.0",
+    "graphql-cli": "^4.1.0",
     "graphql-yoga": "^1.18.3",
+    "prisma-binding": "^2.3.16",
     "uuid": "^8.3.1"
   }
 }
