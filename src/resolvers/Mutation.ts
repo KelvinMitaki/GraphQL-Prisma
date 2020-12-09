@@ -38,7 +38,7 @@ const Mutation = {
     }
     return ctx.prisma.mutation.deleteUser({ where: { id: args.id } }, info);
   },
-  createPost(
+  async createPost(
     parent: any,
     args: {
       data: {
@@ -51,23 +51,14 @@ const Mutation = {
     ctx: Context,
     info: any
   ) {
-    const authorExists = ctx.users.some(
-      usr => usr.id.toLowerCase() === args.data.author.toLowerCase()
-    );
+    const authorExists = ctx.prisma.exists.User({ id: args.data.author });
     if (!authorExists) {
       throw new Error("No author with that ID");
     }
-    const post: typeof posts[0] = { id: v1(), ...args.data };
-    ctx.posts.push(post);
-    if (post.published) {
-      ctx.pubsub.publish("post", {
-        post: {
-          mutation: "CREATED",
-          data: post
-        }
-      });
-    }
-    return post;
+    return ctx.prisma.mutation.createPost(
+      { data: { ...args.data, author: { connect: { id: args.data.author } } } },
+      info
+    );
   },
   updatePost(
     parent: any,
