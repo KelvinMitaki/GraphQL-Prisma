@@ -1,8 +1,10 @@
 import { comments, Context, posts, users } from "../db";
 
+type OpArgs = { [key: string]: string | any };
+
 const Query = {
   users(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    const opArgs = {} as any;
+    const opArgs = {} as OpArgs;
     if (args.query) {
       opArgs.where = {
         OR: [{ name_contains: args.query }, { email_contains: args.query }]
@@ -11,7 +13,7 @@ const Query = {
     return ctx.prisma.query.users(opArgs, info);
   },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    const opArgs = {} as any;
+    const opArgs = {} as OpArgs;
     if (args.query) {
       opArgs.where = {
         OR: [{ title_contains: args.query }, { body_contains: args.query }]
@@ -20,14 +22,13 @@ const Query = {
     return ctx.prisma.query.posts(opArgs, info);
   },
   comments(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    if (!args.query) {
-      return comments;
+    const opArgs = {} as OpArgs;
+    if (args.query) {
+      opArgs.where = {
+        OR: [{ text_contains: args.query }, { author_contains: args.query }]
+      };
     }
-    return ctx.comments.filter(
-      cmt =>
-        cmt.text.toLowerCase().includes(args.query!.toLowerCase()) ||
-        cmt.author.toLowerCase().includes(args.query!.toLowerCase())
-    );
+    return ctx.prisma.query.comments(opArgs, info);
   },
   me() {
     return {
