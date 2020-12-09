@@ -91,25 +91,18 @@ const Mutation = {
     ctx: Context,
     info: any
   ) {
-    const postExists = ctx.posts.some(
-      pst => pst.id === args.data.post && pst.published
-    );
-    const authorExists = ctx.users.some(usr => usr.id === args.data.author);
+    const postExists = ctx.prisma.exists.Post({ id: args.data.post });
+    const authorExists = ctx.prisma.exists.User({ id: args.data.author });
     if (!postExists || !authorExists) {
       throw new Error("post or author doesnot exist");
     }
-    const comment: typeof comments[0] = {
-      id: v1(),
-      ...args.data
-    };
-    ctx.comments.push(comment);
-    ctx.pubsub.publish(`comment ${args.data.post}`, {
-      comment: {
-        mutation: "CREATED",
-        data: comment
+    return ctx.prisma.mutation.createComment({
+      data: {
+        ...args.data,
+        author: { connect: { id: args.data.author } },
+        post: { connect: { id: args.data.post } }
       }
     });
-    return comment;
   },
   updateComment(
     parent: any,
