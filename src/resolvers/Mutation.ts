@@ -42,20 +42,12 @@ const Mutation = {
     }
     return ctx.users[userIndx];
   },
-  deleteUser(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const userIndx = ctx.users.findIndex(usr => usr.id === args.id);
-    if (userIndx === -1) {
+  async deleteUser(parent: any, args: { id: string }, ctx: Context, info: any) {
+    const userExists = await ctx.prisma.exists.User({ id: args.id });
+    if (!userExists) {
       throw new Error("No user with that id");
     }
-    const [deletedUser] = ctx.users.splice(userIndx, 1);
-    ctx.posts = ctx.posts.filter(pst => {
-      if (pst.author === args.id) {
-        ctx.comments = ctx.comments.filter(cmt => cmt.author !== args.id);
-      }
-      return pst.author !== args.id;
-    });
-    ctx.comments = ctx.comments.filter(cmt => cmt.author !== args.id);
-    return deletedUser;
+    return ctx.prisma.mutation.deleteUser({ where: { id: args.id } }, info);
   },
   createPost(
     parent: any,
