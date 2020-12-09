@@ -60,7 +60,7 @@ const Mutation = {
       info
     );
   },
-  updatePost(
+  async updatePost(
     parent: any,
     args: {
       id: string;
@@ -69,38 +69,14 @@ const Mutation = {
     ctx: Context,
     info: any
   ) {
-    const postIndx = ctx.posts.findIndex(pst => pst.id === args.id);
-    if (postIndx === -1) {
-      throw new Error("No post with that id");
+    const postExists = await ctx.prisma.exists.Post({ id: args.id });
+    if (!postExists) {
+      throw new Error("No post with that ID");
     }
-    const originalPost = ctx.posts[postIndx];
-    ctx.posts[postIndx] = { ...ctx.posts[postIndx], ...args.data };
-    if (typeof args.data.published === "boolean") {
-      if (originalPost.published && !ctx.posts[postIndx].published) {
-        ctx.pubsub.publish("post", {
-          post: {
-            mutation: "DELETED",
-            data: originalPost
-          }
-        });
-      }
-      if (!originalPost.published && ctx.posts[postIndx].published) {
-        ctx.pubsub.publish("post", {
-          post: {
-            mutation: "CREATED",
-            data: ctx.posts[postIndx]
-          }
-        });
-      }
-    } else {
-      ctx.pubsub.publish("post", {
-        post: {
-          mutation: "UPDATED",
-          data: ctx.posts[postIndx]
-        }
-      });
-    }
-    return ctx.posts[postIndx];
+    return ctx.prisma.mutation.updatePost(
+      { where: { id: args.id }, data: args.data },
+      info
+    );
   },
   deletePost(parent: any, args: { id: string }, ctx: Context, info: any) {
     const postIndx = ctx.posts.findIndex(pst => pst.id === args.id);
