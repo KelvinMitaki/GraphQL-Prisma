@@ -5,48 +5,6 @@ const prisma = new Prisma({
   endpoint: "http://localhost:4466"
 });
 
-// prisma.query
-//   .comments({}, "{id text author {id name}}")
-//   .then(data => console.log(JSON.stringify(data, null, 2)))
-//   .catch(err => console.log(err));
-
-// prisma.mutation
-//   .createPost(
-//     {
-//       data: {
-//         title: "GraphQL 101",
-//         body: "",
-//         published: false,
-//         author: {
-//           connect: {
-//             email: "kevin@gmail.com"
-//           }
-//         }
-//       }
-//     },
-//     " {id title body published author { id name }}"
-//   )
-//   .then(data => {
-//     console.log(data);
-//     return prisma.query.users({}, "{id name posts {id title}}");
-//   })
-//   .then(data => console.log(JSON.stringify(data, null, 2)))
-//   .catch(err => console.log(err));
-
-// prisma.mutation
-//   .updatePost(
-//     {
-//       data: { body: "this is GraphQL", published: true },
-//       where: { id: "ckih9j9nz00i70884d69vkqdg" }
-//     },
-//     "{id title body published}"
-//   )
-//   .then(data => {
-//     console.log(data);
-//     return prisma.query.posts({}, "{id title body published}");
-//   })
-//   .then(data => console.log(JSON.stringify(data)));
-
 const createPostForUser = async (
   data: { title: string; body: string; published: boolean },
   authorId: string
@@ -88,9 +46,9 @@ const updatePostForUser = async (
   return post;
 };
 
-updatePostForUser(
-  { title: "second post", body: "this is the second post" },
-  "ckihb4ckx00o2088458lkibke"
-)
-  .then(data => console.log(JSON.stringify(data, null, 2)))
-  .catch(err => console.log(err));
+// updatePostForUser(
+//   { title: "second post", body: "this is the second post" },
+//   "ckihb4ckx00o2088458lkibk"
+// )
+//   .then(data => console.log(JSON.stringify(data, null, 2)))
+//   .catch(err => console.log(err.message));
