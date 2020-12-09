@@ -11,4 +11,12 @@ type Post {
   body: String!
   published: Boolean!
   author: User!
+  comments: [Comment!]!
+}
+
+type Comment {
+  id: ID! @unique
+  text: String!
+  author: User!
+  post: Post!
 }
