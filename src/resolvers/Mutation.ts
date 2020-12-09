@@ -16,31 +16,20 @@ const Mutation = {
 
     return ctx.prisma.mutation.createUser({ data: args.data }, info);
   },
-  updateUser(
+  async updateUser(
     parent: any,
     args: { id: string; data: { name?: string; email?: string; age?: number } },
     ctx: Context,
     info: any
   ) {
-    const userIndx = ctx.users.findIndex(usr => usr.id === args.id);
-    if (userIndx === -1) {
+    const userExists = await ctx.prisma.exists.User({ id: args.id });
+    if (!userExists) {
       throw new Error("No user with that ID");
     }
-    const user = ctx.users[userIndx];
-    if (typeof args.data.name === "string") {
-      user.name = args.data.name;
-    }
-    if (typeof args.data.email === "string") {
-      const emailExists = ctx.users.some(usr => usr.email === args.data.email);
-      if (emailExists) {
-        throw new Error("email already taken");
-      }
-      user.email = args.data.email;
-    }
-    if (typeof args.data.age !== "undefined") {
-      user.age = args.data.age;
-    }
-    return ctx.users[userIndx];
+    return ctx.prisma.mutation.updateUser(
+      { data: args.data, where: { id: args.id } },
+      info
+    );
   },
   async deleteUser(parent: any, args: { id: string }, ctx: Context, info: any) {
     const userExists = await ctx.prisma.exists.User({ id: args.id });
