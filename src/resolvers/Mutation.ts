@@ -85,24 +85,30 @@ const Mutation = {
     }
     return ctx.prisma.mutation.deletePost({ where: { id: args.id } }, info);
   },
-  createComment(
+  async createComment(
     parent: any,
     args: { data: { text: string; author: string; post: string } },
     ctx: Context,
     info: any
   ) {
-    const postExists = ctx.prisma.exists.Post({ id: args.data.post });
-    const authorExists = ctx.prisma.exists.User({ id: args.data.author });
+    const postExists = await ctx.prisma.exists.Post({
+      id: args.data.post,
+      published: true
+    });
+    const authorExists = await ctx.prisma.exists.User({ id: args.data.author });
     if (!postExists || !authorExists) {
       throw new Error("post or author doesnot exist");
     }
-    return ctx.prisma.mutation.createComment({
-      data: {
-        ...args.data,
-        author: { connect: { id: args.data.author } },
-        post: { connect: { id: args.data.post } }
-      }
-    });
+    return ctx.prisma.mutation.createComment(
+      {
+        data: {
+          ...args.data,
+          author: { connect: { id: args.data.author } },
+          post: { connect: { id: args.data.post } }
+        }
+      },
+      info
+    );
   },
   updateComment(
     parent: any,
@@ -110,32 +116,21 @@ const Mutation = {
     ctx: Context,
     info: any
   ) {
-    const cmtIndx = ctx.comments.findIndex(cmt => cmt.id === args.id);
-    if (cmtIndx === -1) {
+    const commentExists = ctx.prisma.exists.Comment({ id: args.id });
+    if (!commentExists) {
       throw new Error("Comment not found");
     }
-    ctx.comments[cmtIndx].text = args.data.text;
-    ctx.pubsub.publish(`comment ${ctx.comments[cmtIndx].post}`, {
-      comment: {
-        mutation: "UPDATED",
-        data: ctx.comments[cmtIndx]
-      }
-    });
-    return ctx.comments[cmtIndx];
+    return ctx.prisma.mutation.updateComment(
+      { where: { id: args.id }, data: args.data },
+      info
+    );
   },
   deleteComment(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const commentIndx = ctx.comments.findIndex(cmt => cmt.id === args.id);
-    if (commentIndx === -1) {
+    const commentExists = ctx.prisma.exists.Comment({ id: args.id });
+    if (!commentExists) {
       throw new Error("No comment with that id");
     }
-    const [deletedComment] = ctx.comments.splice(commentIndx, 1);
-    ctx.pubsub.publish(`comment ${deletedComment.post}`, {
-      comment: {
-        mutation: "DELETED",
-        data: deletedComment
-      }
-    });
-    return deletedComment;
+    return ctx.prisma.mutation.deleteComment({ where: { id: args.id } }, info);
   }
 };
 
