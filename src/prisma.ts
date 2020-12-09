@@ -5,21 +5,23 @@ const prisma = new Prisma({
   endpoint: "http://localhost:4466"
 });
 
-const createPostForUser = async (
-  data: { title: string; body: string; published: boolean },
-  authorId: string
-) => {
-  const exists = await prisma.exists.User({ id: authorId });
-  if (!exists) {
-    throw new Error("User not found");
-  }
-  const post = await prisma.mutation.createPost(
-    { data: { ...data, author: { connect: { id: authorId } } } },
-    "{author{id name email posts{id title body published}}}"
-  );
+export { prisma };
 
-  return post;
-};
+// const createPostForUser = async (
+//   data: { title: string; body: string; published: boolean },
+//   authorId: string
+// ) => {
+//   const exists = await prisma.exists.User({ id: authorId });
+//   if (!exists) {
+//     throw new Error("User not found");
+//   }
+//   const post = await prisma.mutation.createPost(
+//     { data: { ...data, author: { connect: { id: authorId } } } },
+//     "{author{id name email posts{id title body published}}}"
+//   );
+
+//   return post;
+// };
 // createPostForUser(
 //   {
 //     title: "new post",
@@ -31,20 +33,20 @@ const createPostForUser = async (
 //   .then(user => console.log(JSON.stringify(user, null, 2)))
 //   .catch(err => console.log(err));
 
-const updatePostForUser = async (
-  data: { body: string; title: string },
-  postId: string
-) => {
-  const postExists = await prisma.exists.Post({ id: postId });
-  if (!postExists) {
-    throw new Error("no post with that id");
-  }
-  const post = await prisma.mutation.updatePost(
-    { data, where: { id: postId } },
-    "{author{id name email posts{id title body}}}"
-  );
-  return post;
-};
+// const updatePostForUser = async (
+//   data: { body: string; title: string },
+//   postId: string
+// ) => {
+//   const postExists = await prisma.exists.Post({ id: postId });
+//   if (!postExists) {
+//     throw new Error("no post with that id");
+//   }
+//   const post = await prisma.mutation.updatePost(
+//     { data, where: { id: postId } },
+//     "{author{id name email posts{id title body}}}"
+//   );
+//   return post;
+// };
 
 // updatePostForUser(
 //   { title: "second post", body: "this is the second post" },

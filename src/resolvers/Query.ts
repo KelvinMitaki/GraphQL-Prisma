@@ -2,12 +2,13 @@ import { comments, Context, posts, users } from "../db";
 
 const Query = {
   users(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    if (!args.query) {
-      return users;
-    }
-    return ctx.users.filter(usr =>
-      usr.name.toLowerCase().includes(args.query!.toLowerCase())
-    );
+    // if (!args.query) {
+    //   return users;
+    // }
+    // return ctx.users.filter(usr =>
+    //   usr.name.toLowerCase().includes(args.query!.toLowerCase())
+    // );
+    return ctx.prisma.query.users(undefined, info);
   },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
     if (!args.query) {
