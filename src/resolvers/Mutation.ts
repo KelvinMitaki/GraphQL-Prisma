@@ -1,11 +1,13 @@
 import { comments, posts, users } from "../db";
-import { v1 } from "uuid";
+import bcrypt from "bcryptjs";
 import { Context } from "../db";
 
 const Mutation = {
   async createUser(
     parent: any,
-    args: { data: { name: string; email: string; age: number } },
+    args: {
+      data: { name: string; email: string; age: number; password: string };
+    },
     ctx: Context,
     info: any
   ) {
@@ -13,7 +15,10 @@ const Mutation = {
     if (emailTaken) {
       throw new Error("User with that email already exists");
     }
-
+    if (args.data.password.trim().length < 6) {
+      throw new Error("password must be atleast six characters");
+    }
+    args.data.password = await bcrypt.hash(args.data.password, 8);
     return ctx.prisma.mutation.createUser({ data: args.data }, info);
   },
   async updateUser(
