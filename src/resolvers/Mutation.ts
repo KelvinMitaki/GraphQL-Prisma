@@ -18,18 +18,24 @@ const Mutation = {
     if (args.data.password.trim().length < 6) {
       throw new Error("password must be atleast six characters");
     }
-    args.data.password = await bcrypt.hash(args.data.password, 8);
+    args.data.password = await bcrypt.hash(args.data.password, 10);
     return ctx.prisma.mutation.createUser({ data: args.data }, info);
   },
   async updateUser(
     parent: any,
-    args: { id: string; data: { name?: string; email?: string; age?: number } },
+    args: {
+      id: string;
+      data: { name?: string; email?: string; age?: number; password?: string };
+    },
     ctx: Context,
     info: any
   ) {
     const userExists = await ctx.prisma.exists.User({ id: args.id });
     if (!userExists) {
       throw new Error("No user with that ID");
+    }
+    if (args.data.password) {
+      args.data.password = await bcrypt.hash(args.data.password, 10);
     }
     return ctx.prisma.mutation.updateUser(
       { data: args.data, where: { id: args.id } },
