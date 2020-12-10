@@ -13,6 +13,19 @@ const Query = {
     }
     return ctx.prisma.query.users(opArgs, info);
   },
+  myPosts(parent: any, args: { query?: string }, ctx: Context, info: any) {
+    const userId = getUserId(ctx.request);
+    const opArgs = {
+      where: { author: { id: userId } }
+    } as OpArgs;
+    if (args.query) {
+      opArgs.where = {
+        ...opArgs.where,
+        OR: [{ title_contains: args.query }, { body_contains: args.query }]
+      };
+    }
+    return ctx.prisma.query.posts(opArgs, info);
+  },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
     const opArgs = {
       where: { published: true }
