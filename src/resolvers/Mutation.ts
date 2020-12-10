@@ -1,5 +1,6 @@
 import { comments, posts, users } from "../db";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { Context } from "../db";
 
 const Mutation = {
@@ -19,7 +20,11 @@ const Mutation = {
       throw new Error("password must be atleast six characters");
     }
     args.data.password = await bcrypt.hash(args.data.password, 10);
-    return ctx.prisma.mutation.createUser({ data: args.data }, info);
+    const user = await ctx.prisma.mutation.createUser({ data: args.data });
+    return {
+      user,
+      token: jwt.sign({ id: user.id }, "jkshkjhdskjhdskewyoiuoiqw")
+    };
   },
   async updateUser(
     parent: any,

@@ -1,12 +1,13 @@
 type Query {
   users(query: String): [User!]!
+  user(query: UserWhereUniqueInput!): User
   posts(query: String): [Post!]!
   comments(query: String): [Comment!]!
   me: User!
   post: Post!
 }
 type Mutation {
-  createUser(data: createUserInput!): User!
+  createUser(data: createUserInput!): AuthPayload!
   updateUser(id: ID!, data: updateUserInput!): User!
   deleteUser(id: ID!): User!
   createPost(data: createPostInput!): Post!
@@ -21,7 +22,10 @@ type Subscription {
   comment(id: String!): CommentSubscriptionPayload!
   post: PostSubscriptionPayload!
 }
-
+input UserWhereUniqueInput {
+  id: ID
+  email: String
+}
 input createUserInput {
   name: String!
   email: String!
@@ -49,6 +53,11 @@ input createCommentInput {
 }
 input updateCommentInput {
   text: String
+}
+
+type AuthPayload {
+  user: User!
+  token: String!
 }
 
 type User {

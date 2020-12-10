@@ -37,6 +37,14 @@ const Query = {
     }
     return ctx.prisma.query.comments(opArgs, info);
   },
+  user(
+    parent: any,
+    args: { email?: string; id?: string },
+    ctx: Context,
+    info: any
+  ) {
+    return ctx.prisma.query.user({ where: args }, info);
+  },
   me() {
     return {
       id: "123098",
