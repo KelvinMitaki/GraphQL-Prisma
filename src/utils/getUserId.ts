@@ -13,6 +13,7 @@ const getUserId = (req: ContextParameters, requireAuth: boolean = true) => {
   if (requireAuth) {
     throw new Error("auth required");
   }
+  return null;
 };
 
 export default getUserId;

@@ -1,4 +1,5 @@
 import { comments, Context, posts, users } from "../db";
+import getUserId from "../utils/getUserId";
 
 type OpArgs = { [key: string]: string | any };
 
@@ -53,13 +54,18 @@ const Query = {
       age: 21
     };
   },
-  post() {
-    return {
-      id: "jkhkj132",
-      title: "First blog",
-      body: "This is the first blog",
-      published: true
-    };
+  async post(parent: any, args: { id: string }, ctx: Context, info: any) {
+    const userId = getUserId(ctx.request, false);
+
+    const post = await ctx.prisma.query.post({ where: { id: args.id } });
+
+    if (userId) {
+      return post;
+    }
+    if (!userId && !post.published) {
+      throw new Error("No post with that id");
+    }
+    return post;
   }
 };
 
