@@ -104,6 +104,11 @@ const Mutation = {
     if (!postExists) {
       throw new Error("No post with that ID");
     }
+    if (args.data.published === false) {
+      await ctx.prisma.mutation.deleteManyComments({
+        where: { post: { id: args.id } }
+      });
+    }
     return ctx.prisma.mutation.updatePost(
       { where: { id: args.id }, data: args.data },
       info
