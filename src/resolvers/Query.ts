@@ -14,9 +14,12 @@ const Query = {
     return ctx.prisma.query.users(opArgs, info);
   },
   posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    const opArgs = {} as OpArgs;
+    const opArgs = {
+      where: { published: true }
+    } as OpArgs;
     if (args.query) {
       opArgs.where = {
+        ...opArgs.where,
         OR: [{ title_contains: args.query }, { body_contains: args.query }]
       };
     }
