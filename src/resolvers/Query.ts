@@ -4,8 +4,17 @@ import getUserId from "../utils/getUserId";
 type OpArgs = { [key: string]: string | any };
 
 const Query = {
-  users(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    const opArgs = {} as OpArgs;
+  users(
+    parent: any,
+    args: { query?: string; first?: number; skip?: number; after?: string },
+    ctx: Context,
+    info: any
+  ) {
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    } as OpArgs;
     if (args.query) {
       opArgs.where = {
         name_contains: args.query
@@ -13,10 +22,18 @@ const Query = {
     }
     return ctx.prisma.query.users(opArgs, info);
   },
-  myPosts(parent: any, args: { query?: string }, ctx: Context, info: any) {
+  myPosts(
+    parent: any,
+    args: { query?: string; first?: number; skip?: number; after?: string },
+    ctx: Context,
+    info: any
+  ) {
     const userId = getUserId(ctx.request);
     const opArgs = {
-      where: { author: { id: userId } }
+      where: { author: { id: userId } },
+      first: args.first,
+      skip: args.skip,
+      after: args.after
     } as OpArgs;
     if (args.query) {
       opArgs.where = {
@@ -26,9 +43,17 @@ const Query = {
     }
     return ctx.prisma.query.posts(opArgs, info);
   },
-  posts(parent: any, args: { query?: string }, ctx: Context, info: any) {
+  posts(
+    parent: any,
+    args: { query?: string; first?: number; skip?: number; after?: string },
+    ctx: Context,
+    info: any
+  ) {
     const opArgs = {
-      where: { published: true }
+      where: { published: true },
+      first: args.first,
+      skip: args.skip,
+      after: args.after
     } as OpArgs;
     if (args.query) {
       opArgs.where = {
@@ -38,8 +63,17 @@ const Query = {
     }
     return ctx.prisma.query.posts(opArgs, info);
   },
-  comments(parent: any, args: { query?: string }, ctx: Context, info: any) {
-    const opArgs = {} as OpArgs;
+  comments(
+    parent: any,
+    args: { query?: string; first?: number; skip?: number; after?: string },
+    ctx: Context,
+    info: any
+  ) {
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after
+    } as OpArgs;
     if (args.query) {
       opArgs.where = {
         OR: [
