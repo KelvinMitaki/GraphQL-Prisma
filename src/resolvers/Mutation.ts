@@ -28,15 +28,17 @@ const Mutation = {
   },
   async login(
     parent: any,
-    args: { email: string; password: string },
+    args: { data: { email: string; password: string } },
     ctx: Context,
     info: any
   ) {
-    const user = await ctx.prisma.query.user({ where: { email: args.email } });
+    const user = await ctx.prisma.query.user({
+      where: { email: args.data.email }
+    });
     if (!user) {
       throw new Error("Invalid email or password");
     }
-    const isMatch = await bcrypt.compare(args.password, user.password);
+    const isMatch = await bcrypt.compare(args.data.password, user.password);
     if (!isMatch) {
       throw new Error("Invalid email or password");
     }
