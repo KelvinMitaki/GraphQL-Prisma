@@ -51,30 +51,23 @@ const Mutation = {
   async updateUser(
     parent: any,
     args: {
-      id: string;
       data: { name?: string; email?: string; age?: number; password?: string };
     },
     ctx: Context,
     info: any
   ) {
-    const userExists = await ctx.prisma.exists.User({ id: args.id });
-    if (!userExists) {
-      throw new Error("No user with that ID");
-    }
+    const userId = getUserId(ctx.request);
     if (args.data.password) {
       args.data.password = await bcrypt.hash(args.data.password, 10);
     }
     return ctx.prisma.mutation.updateUser(
-      { data: args.data, where: { id: args.id } },
+      { data: args.data, where: { id: userId } },
       info
     );
   },
   async deleteUser(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const userExists = await ctx.prisma.exists.User({ id: args.id });
-    if (!userExists) {
-      throw new Error("No user with that id");
-    }
-    return ctx.prisma.mutation.deleteUser({ where: { id: args.id } }, info);
+    const userId = getUserId(ctx.request);
+    return ctx.prisma.mutation.deleteUser({ where: { id: userId } }, info);
   },
   async createPost(
     parent: any,
