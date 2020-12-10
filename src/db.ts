@@ -1,4 +1,5 @@
 import { PubSub } from "graphql-yoga";
+import { ContextParameters } from "graphql-yoga/dist/types";
 import { Prisma } from "prisma-binding";
 
 let users = [
@@ -77,6 +78,7 @@ export interface Context {
   users: typeof users;
   pubsub: PubSub;
   prisma: Prisma;
+  request: ContextParameters;
 }
 
 export { users, comments, posts };
