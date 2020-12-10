@@ -46,17 +46,12 @@ const Query = {
   ) {
     return ctx.prisma.query.user({ where: args.query }, info);
   },
-  me() {
-    return {
-      id: "123098",
-      name: "kevin",
-      email: "kevin@gmail.com",
-      age: 21
-    };
+  me(parent: any, args: any, ctx: Context, info: any) {
+    const userId = getUserId(ctx.request);
+    return ctx.prisma.query.user({ where: { id: userId } }, info);
   },
   async post(parent: any, args: { id: string }, ctx: Context, info: any) {
     const userId = getUserId(ctx.request, false);
-
     const post = await ctx.prisma.query.posts(
       {
         where: {
