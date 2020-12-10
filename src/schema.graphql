@@ -4,7 +4,7 @@ type Query {
   posts(query: String): [Post!]!
   comments(query: String): [Comment!]!
   me: User!
-  post: Post!
+  post(id: String!): Post!
 }
 type Mutation {
   createUser(data: createUserInput!): AuthPayload!

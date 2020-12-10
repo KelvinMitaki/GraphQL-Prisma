@@ -57,15 +57,19 @@ const Query = {
   async post(parent: any, args: { id: string }, ctx: Context, info: any) {
     const userId = getUserId(ctx.request, false);
 
-    const post = await ctx.prisma.query.post({ where: { id: args.id } });
-
-    if (userId) {
-      return post;
-    }
-    if (!userId && !post.published) {
+    const post = await ctx.prisma.query.posts(
+      {
+        where: {
+          id: args.id,
+          OR: [{ author: { id: userId } }, { published: true }]
+        }
+      },
+      info
+    );
+    if (!post || (post && post.length === 0)) {
       throw new Error("No post with that id");
     }
-    return post;
+    return post[0];
   }
 };
 
