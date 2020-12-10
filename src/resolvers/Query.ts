@@ -39,11 +39,11 @@ const Query = {
   },
   user(
     parent: any,
-    args: { email?: string; id?: string },
+    args: { query: { email?: string; id?: string } },
     ctx: Context,
     info: any
   ) {
-    return ctx.prisma.query.user({ where: args }, info);
+    return ctx.prisma.query.user({ where: args.query }, info);
   },
   me() {
     return {
