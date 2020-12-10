@@ -96,7 +96,11 @@ const Mutation = {
     ctx: Context,
     info: any
   ) {
-    const postExists = await ctx.prisma.exists.Post({ id: args.id });
+    const userId = getUserId(ctx.request);
+    const postExists = await ctx.prisma.exists.Post({
+      id: args.id,
+      author: { id: userId }
+    });
     if (!postExists) {
       throw new Error("No post with that ID");
     }
@@ -106,7 +110,11 @@ const Mutation = {
     );
   },
   async deletePost(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const postExists = await ctx.prisma.exists.Post({ id: args.id });
+    const userId = getUserId(ctx.request);
+    const postExists = await ctx.prisma.exists.Post({
+      id: args.id,
+      author: { id: userId }
+    });
     if (!postExists) {
       throw new Error("No post with that ID");
     }
@@ -114,7 +122,7 @@ const Mutation = {
   },
   async createComment(
     parent: any,
-    args: { data: { text: string; author: string; post: string } },
+    args: { data: { text: string; post: string } },
     ctx: Context,
     info: any
   ) {
@@ -122,28 +130,32 @@ const Mutation = {
       id: args.data.post,
       published: true
     });
-    const authorExists = await ctx.prisma.exists.User({ id: args.data.author });
-    if (!postExists || !authorExists) {
+    if (!postExists) {
       throw new Error("post or author doesnot exist");
     }
+    const userId = getUserId(ctx.request);
     return ctx.prisma.mutation.createComment(
       {
         data: {
           ...args.data,
-          author: { connect: { id: args.data.author } },
+          author: { connect: { id: userId } },
           post: { connect: { id: args.data.post } }
         }
       },
       info
     );
   },
-  updateComment(
+  async updateComment(
     parent: any,
     args: { id: string; data: { text: string } },
     ctx: Context,
     info: any
   ) {
-    const commentExists = ctx.prisma.exists.Comment({ id: args.id });
+    const userId = getUserId(ctx.request);
+    const commentExists = await ctx.prisma.exists.Comment({
+      id: args.id,
+      author: { id: userId }
+    });
     if (!commentExists) {
       throw new Error("Comment not found");
     }
@@ -152,8 +164,17 @@ const Mutation = {
       info
     );
   },
-  deleteComment(parent: any, args: { id: string }, ctx: Context, info: any) {
-    const commentExists = ctx.prisma.exists.Comment({ id: args.id });
+  async deleteComment(
+    parent: any,
+    args: { id: string },
+    ctx: Context,
+    info: any
+  ) {
+    const userId = getUserId(ctx.request);
+    const commentExists = await ctx.prisma.exists.Comment({
+      id: args.id,
+      author: { id: userId }
+    });
     if (!commentExists) {
       throw new Error("No comment with that id");
     }
