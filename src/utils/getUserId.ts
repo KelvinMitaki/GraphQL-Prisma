@@ -12,3 +12,5 @@ const getUserId = (req: ContextParameters) => {
   };
   return verified.id;
 };
+
+export default getUserId;

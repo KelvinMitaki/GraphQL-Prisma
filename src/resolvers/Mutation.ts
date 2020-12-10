@@ -2,6 +2,7 @@ import { comments, posts, users } from "../db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Context } from "../db";
+import getUserId from "../utils/getUserId";
 
 const Mutation = {
   async createUser(
@@ -82,18 +83,14 @@ const Mutation = {
         title: string;
         body: string;
         published: boolean;
-        author: string;
       };
     },
     ctx: Context,
     info: any
   ) {
-    const authorExists = ctx.prisma.exists.User({ id: args.data.author });
-    if (!authorExists) {
-      throw new Error("No author with that ID");
-    }
+    const userId = getUserId(ctx.request);
     return ctx.prisma.mutation.createPost(
-      { data: { ...args.data, author: { connect: { id: args.data.author } } } },
+      { data: { ...args.data, author: { connect: { id: userId } } } },
       info
     );
   },
